@@ -1,0 +1,34 @@
+### Ambil semua data mahasiswa
+GET http://localhost:5000/mahasiswa
+
+###
+### Ambil data mahasiswa berdasarkan ID
+GET http://localhost:5000/mahasiswa/1
+
+###
+### Tambah data mahasiswa baru
+POST http://localhost:5000/mahasiswa
+Content-Type: application/json
+
+{
+  "nama": "Ahmad Fikri",
+  "npm": "221501004",
+  "jurusan": "Hukum",
+  "angkatan": 2022
+}
+
+###
+### Update data mahasiswa berdasarkan ID
+PATCH http://localhost:5000/mahasiswa/1
+Content-Type: application/json
+
+{
+  "nama": "Ahmad Fikri Ramadhan",
+  "npm": "221501004",
+  "jurusan": "Hukum Bisnis",
+  "angkatan": 2022
+}
+
+###
+### Hapus data mahasiswa berdasarkan ID
+DELETE http://localhost:5000/mahasiswa/1

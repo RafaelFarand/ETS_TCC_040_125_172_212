@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <title>Data Mahasiswa</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="container">
+    <h1>Data Mahasiswa</h1>
+
+    <!-- Form Tambah / Edit -->
+    <form id="mahasiswa-form">
+      <input type="hidden" id="id" />
+      <input type="text" id="nama" placeholder="Nama" required />
+      <input type="text" id="npm" placeholder="NPM" required />
+      <input type="text" id="jurusan" placeholder="Jurusan" required />
+      <input type="number" id="angkatan" placeholder="Angkatan" required />
+      <button type="submit">Simpan</button>
+      <button type="button" id="batal" class="batal">Batal</button>
+    </form>
+
+    <hr />
+
+    <!-- Tabel Mahasiswa -->
+    <table>
+      <thead>
+        <tr>
+          <th>Nama</th>
+          <th>NPM</th>
+          <th>Jurusan</th>
+          <th>Angkatan</th>
+          <th>Aksi</th>
+        </tr>
+      </thead>
+      <tbody id="mahasiswa-body">
+        <!-- Data akan diisi dengan JS -->
+      </tbody>
+    </table>
+  </div>
+
+  <script>
+    const API_URL = "http://localhost:5000/mahasiswa";
+
+    const form = document.getElementById("mahasiswa-form");
+    const tbody = document.getElementById("mahasiswa-body");
+    const idInput = document.getElementById("id");
+
+    const fetchMahasiswa = async () => {
+      const res = await fetch(API_URL);
+      const data = await res.json();
+      tbody.innerHTML = "";
+      data.forEach((mhs) => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${mhs.nama}</td>
+          <td>${mhs.npm}</td>
+          <td>${mhs.jurusan}</td>
+          <td>${mhs.angkatan}</td>
+          <td>
+            <button onclick="editMahasiswa(${mhs.id}, '${mhs.nama}', '${mhs.npm}', '${mhs.jurusan}', ${mhs.angkatan})">Edit</button>
+            <button onclick="hapusMahasiswa(${mhs.id})" class="hapus">Hapus</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    };
+
+    const resetForm = () => {
+      form.reset();
+      idInput.value = "";
+    };
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const data = {
+        nama: form.nama.value,
+        npm: form.npm.value,
+        jurusan: form.jurusan.value,
+        angkatan: parseInt(form.angkatan.value),
+      };
+
+      if (idInput.value) {
+        await fetch(`${API_URL}/${idInput.value}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data),
+        });
+      } else {
+        await fetch(API_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data),
+        });
+      }
+
+      resetForm();
+      fetchMahasiswa();
+    });
+
+    document.getElementById("batal").addEventListener("click", resetForm);
+
+    window.editMahasiswa = (id, nama, npm, jurusan, angkatan) => {
+      idInput.value = id;
+      form.nama.value = nama;
+      form.npm.value = npm;
+      form.jurusan.value = jurusan;
+      form.angkatan.value = angkatan;
+    };
+
+    window.hapusMahasiswa = async (id) => {
+      if (confirm("Yakin ingin menghapus data ini?")) {
+        await fetch(`${API_URL}/${id}`, { method: "DELETE" });
+        fetchMahasiswa();
+      }
+    };
+
+    // Load awal
+    fetchMahasiswa();
+  </script>
+</body>
+</html>
